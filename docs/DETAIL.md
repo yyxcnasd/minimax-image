@@ -6,13 +6,13 @@ Two model tools, one composer switch, and one settings page.
 
 A chip in the composer tool row, next to the permission and mode chips:
 
-- a 14px creation glyph and the same 14px chevron the permission chip uses, both taken from the product icon set's regular weight (1px stroke on a 16px viewBox), then `生图：不允许 / 生图：允许`;
+- a 14px creation glyph and the same 14px chevron the permission chip uses, both taken from the product icon set's regular weight (1px stroke on a 16px viewBox), then the locale label for the state (English: `Image: Off` / `Image: On`);
 - the visual language follows the shipped permission chip: 28px tall, 13px/500 text in `--dsw-alias-label-secondary`, `--dsw-radius-sm`, transparent until hover, hover fill `--dsw-alias-interactive-bg-hover`, the product focus ring, and the same `@container (max-width: 460px)` rule that drops the label in a narrow composer while keeping the glyph and chevron;
 - the visible chip is a plain `<button>`; opening it shows the plugin's own menu card (portaled to `document.body`, so the docked composer cannot clip or reposition it) with the shipped menu geometry: translucent `--dsw-menu-surface-fill` fill, `--dsw-elevation-prominent`, 4px card padding, 34px rows, and a trailing check on the current row;
 - the chevron rotates 180° while the menu is open, and the product focus ring appears only for keyboard focus (`:focus-visible`), never as a box around a native control;
 - menu keys: ArrowUp/ArrowDown move focus, Enter/Space picks, Escape closes and returns focus to the chip, Tab closes, a pointer press outside closes;
-- the default for a conversation is **不允许**, and the Host remembers each conversation's choice;
-- switching it to **允许** makes both tools available to the model on the next step; switching it off hides them again;
+- the default for a conversation is **off**, and the Host remembers each conversation's choice;
+- switching it on makes both tools available to the model on the next step; switching it off hides them again;
 - the value is enforced twice: neither tool is offered to the model in a conversation that is off, and both refuse to run there even if called;
 - when no API key is saved the glyph turns to the warning color and the tooltip says so, while the dropdown still records the choice;
 - before the Host route can be reached the chip stays visible but disabled, with a tooltip saying image generation is not ready yet.
@@ -30,7 +30,7 @@ Both tools take the same shape, and in both the model chooses the framing.
 | `images` | `edit_image` only: 1–16 reference images in order, each an absolute local path or an `http(s)` URL |
 
 - `generate_image` posts to `/v1/images/generations` with `model`, `prompt`, `n`, `response_format: "url"`, `area`, and `aspect_ratio` (omitted when the ratio is `auto`).
-- `edit_image` posts to `/v1/images/edits` with the same fields plus `images: [{ image_url }]`. A local file is read, size-checked, and inlined as `data:image/…;base64,…`; a URL passes through. The instruction refers to them as 图1, 图2, … in the order given.
+- `edit_image` posts to `/v1/images/edits` with the same fields plus `images: [{ image_url }]`. A local file is read, size-checked, and inlined as `data:image/…;base64,…`; a URL passes through. The instruction refers to them as the first, second, … reference in the order given.
 
 The service derives width and height from the ratio and area and reports them per image as `data[].size`; the tool records that exact size beside each saved file. Each item in `data` either carries `url` (valid for 24 hours) and `revised_prompt`, or an `error`. A partial failure is still HTTP 200, so the tool saves every successful image and lists the failed ones in its result; when nothing succeeds it fails with the service's own message.
 
@@ -38,12 +38,20 @@ Files are written to `<session workspace>/generated-images/` as `minimax-<timest
 
 The result content is text, so the file renders through the built-in `read_image` card when the model opens it — the generic tool card does not draw image blocks for tools other than `read_image`.
 
+## Bundled prompt skill
+
+`skills/minimax-image-prompting.md` is registered at activation through `ctx.skills.register()` as the model-invocable skill `minimax-image-prompting`, so the model can load the full playbook with the `skill` tool whenever an image request arrives.
+
+The playbook covers: the two-question interview that decides use, mood, and series style; the seven-slot prompt skeleton with a length budget and a five-item avoid clause; the aspect-ratio-to-use table and `1K / 2K / 4K` guidance; a reusable six-line style block that keeps a set of images in one art direction; edit discipline (one or two changes per pass, naming what must stay); a symptom-to-lever table for flat light, cheap colour, plastic texture, busy framing, garbled text, and content-safety refusals; prompt templates for product, portrait, landscape, food, character sheet, Chinese-text poster, and illustration; weak-versus-strong prompt pairs; and the rights rules for likeness and trademarks.
+
+The registration is optional by design: a profile without `@deepseek-ai/dsh-skill` keeps both image tools and simply skips the skill. The markdown keeps filesystem-skill frontmatter so the same file also works copied into a skills directory; the registry path strips that frontmatter before handing the body to the model.
+
 ## Settings page
 
-**Settings → MiniMax 生图**:
+**Settings → MiniMax image generation**:
 
-- **接口地址** — defaults to `https://api.minimaxi.com`; a trailing `/v1` is accepted and normalized;
-- **模型** — `MiniMax-H3-Image` (or `MiniMax-H3-Image-Highspeed`);
+- **Endpoint** — defaults to `https://api.minimaxi.com`; a trailing `/v1` is accepted and normalized;
+- **Model** — `MiniMax-H3-Image` (or `MiniMax-H3-Image-Highspeed`);
 - **API Key** — write-only; the page reports whether a key is stored and can clear it.
 
 Endpoint and model are written to `$DSH_HOME/minimax-image/settings.json`, so a save applies to the next request without a restart. The API key is written to the credential store as the `MINIMAX_IMAGE_API_KEY` reference and resolved per request. Aspect ratio and area are deliberately absent here: they belong to the model's per-call choice.

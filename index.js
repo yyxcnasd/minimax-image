@@ -17,6 +17,7 @@
  * credential reference, never in that file.
  */
 
+import { readFileSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { extname, isAbsolute, join } from 'node:path'
@@ -575,4 +576,26 @@ export function apply(ctx, rowConfig) {
       }
     },
   }), `minimax-image: HTTP ${ROUTE_PATH}`)
+
+  // The prompt playbook ships as data next to the plugin and is registered as a
+  // model-invocable skill, so profiles without a skill registry still get the
+  // tools and simply skip this section.
+  const skills = ctx.get('skills')
+  if (skills !== undefined) {
+    try {
+      const raw = readFileSync(new URL('./skills/minimax-image-prompting.md', import.meta.url), 'utf8')
+      // The file keeps filesystem-skill frontmatter so it still works if copied
+      // into a skills directory; the registry wants the instruction body only.
+      const content = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '').trimStart()
+      ctx.effect(() => skills.register({
+        name: 'minimax-image-prompting',
+        description: 'Write MiniMax H3 image prompts and run an image session: interview the user for the missing style decisions, lock one art direction across a series, pick aspect ratio and area, edit by naming what changes and what stays, and fix weak results one lever at a time.',
+        whenToUse: 'Use whenever the user asks for an image, illustration, poster, product shot, character, or wallpaper, or asks to change an existing picture, including requests with no style direction.',
+        source: 'bundled',
+        content,
+      }), 'minimax-image: prompt skill')
+    } catch {
+      // A missing playbook must not take the tools down with it.
+    }
+  }
 }
