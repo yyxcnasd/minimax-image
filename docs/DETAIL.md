@@ -62,7 +62,7 @@ Endpoint and model are written to `$DSH_HOME/minimax-image/settings.json`, so a 
 dsh plugin --profile desktop add github:yyxcnasd/minimax-image   # or: add minimax-image (npm)
 ```
 
-`dsh plugin --profile <name> add ...` forwards to pnpm in the profile and appends the bundle to `dsh.profile.bundles`; the same bundle serves the `web` and `desktop` profiles, provided the profile composes the Web surface bundle. The install needs one restart, because a Loader row added to a running profile cannot resolve the profile's core services until then. Editing a linked package's files does not hot-swap the running Host module either (the Loader reports `restart-required` with `module-comparison`), so a code update also needs one restart; a browser page refresh then picks up the new `client.js`.
+`dsh plugin --profile <name> add ...` forwards to pnpm in the profile and appends the bundle to `dsh.profile.bundles`; the same bundle serves the `web` and `desktop` profiles, provided the profile composes the Web surface bundle. Installing recomposes the profile and usually applies immediately; when the Loader answers `restart-required` (for example after editing a linked package's files, where it reports `module-comparison`), one restart is needed. A browser page refresh then picks up the new `client.js`.
 
 ## Limitations
 

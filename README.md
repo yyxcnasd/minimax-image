@@ -42,7 +42,7 @@ dsh plugin --profile desktop add ./minimax-image
 
 `dsh plugin --profile <name> add ...` forwards to pnpm inside `$DSH_HOME/profiles/<name>`, then appends the bundle to `dsh.profile.bundles`. Use `web` instead of `desktop` for a web profile — the same bundle serves both.
 
-**Restart DeepSeek Harness once** after installing: a Loader row added into a running profile cannot resolve the profile's core services until the process restarts. The chip and the settings page appear after that restart; a browser page refresh then picks up the client half.
+**Installing applies immediately** when the profile can recompose; if the Loader reports `restart-required`, restart DeepSeek Harness once. A browser page refresh loads the client half either way.
 
 Uninstall with:
 
