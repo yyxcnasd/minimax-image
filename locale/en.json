@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "MiniMax image generation",
+    "description": "Adds MiniMax H3 image generation and editing to a conversation: once the composer dropdown allows it, the model gets a text-to-image tool and a reference-image editing tool, choosing aspect ratio and area per call; settings only configure the endpoint, model, and API key.",
+    "detail": "docs/DETAIL.md"
+  }
+}

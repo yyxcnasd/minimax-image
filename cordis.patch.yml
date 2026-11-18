@@ -1,0 +1,12 @@
+# Row for the minimax-image bundle. The row config supplies the initial
+# endpoint, model, and credential reference; the Settings page stores later
+# changes in $DSH_HOME/minimax-image/settings.json, and the API key is stored in
+# the credential store, never in this file. Aspect ratio and area are chosen by
+# the model on each call, not configured here.
+- insert:
+    - id: minimax-image
+      name: minimax-image
+      config:
+        baseUrl: https://api.minimaxi.com
+        model: MiniMax-H3-Image
+        apiKeyEnv: MINIMAX_IMAGE_API_KEY

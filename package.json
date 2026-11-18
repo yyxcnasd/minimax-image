@@ -1,0 +1,40 @@
+{
+  "name": "minimax-image",
+  "version": "0.3.1",
+  "description": "MiniMax H3 image generation and editing for DeepSeek Harness: a per-conversation permission chip in the composer, text-to-image and reference-image editing tools the model picks framing for, and a Settings page for the endpoint, model, and API key.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "minimax", "image-generation", "image-editing"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yyxcnasd/minimax-image.git"
+  },
+  "homepage": "https://github.com/yyxcnasd/minimax-image#readme",
+  "bugs": {
+    "url": "https://github.com/yyxcnasd/minimax-image/issues"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": ["@deepseek-ai/dsh-client-ui-conversation"]
+    }
+  }
+}

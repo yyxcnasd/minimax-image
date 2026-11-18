@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "MiniMax 生图",
+    "description": "为对话接入 MiniMax H3 图片生成与编辑：输入框内的下拉框允许后，模型可用文生图和图编辑两个工具，画面比例与面积档位由模型按需决定；设置页只配置接口、模型与 API Key。",
+    "detail": "docs/DETAIL.md"
+  }
+}
