@@ -26,6 +26,8 @@ The package ships plain ESM with no build script, so pnpm runs nothing at instal
 dsh plugin --profile desktop add github:yyxcnasd/minimax-image#<commit-sha>
 ```
 
+A git install shells out to `git ls-remote` against `github.com:443`, so on a network that blocks that host use the npm package or a packed tarball instead (`dsh plugin --profile desktop add ./minimax-image-0.3.1.tgz`).
+
 ### From npm
 
 ```sh
@@ -89,6 +91,15 @@ Endpoint and model are stored in `$DSH_HOME/minimax-image/settings.json` and app
 - HEIC/HEIF references are recognised by extension only.
 - The API key is stored per credential reference, not per model: switching the model keeps the same key.
 - Editing the package's files in place does not hot-swap the running Host module; a code update needs a restart.
+
+## Releasing
+
+The registry name is exactly `minimax-image` — that is what `dsh plugin add minimax-image` resolves. There is no build step: `index.js` and `client.js` are the shipped files, and `files` already lists every runtime asset.
+
+```sh
+npm publish
+gh release create v0.3.1 --generate-notes   # optional
+```
 
 ## License
 
